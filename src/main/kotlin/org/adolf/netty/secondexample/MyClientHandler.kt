@@ -16,4 +16,8 @@ class MyClientHandler : SimpleChannelInboundHandler<String>() {
         cause.printStackTrace()
         ctx.close()
     }
+
+    override fun channelActive(ctx: ChannelHandlerContext) {
+        ctx.writeAndFlush("来自客户端的问候")
+    }
 }
