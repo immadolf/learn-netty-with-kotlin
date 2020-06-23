@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package org.adolf.protobuf;
+
+option java_package = "org.adolf.protobuf";
+option java_outer_classname = "StudentProtos";
+
+message Student {
+  required string name = 1;
+  optional int32 age = 2;
+  optional string address = 3;
+}
