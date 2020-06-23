@@ -25,6 +25,6 @@ class WebSocketChannelInitializer : ChannelInitializer<SocketChannel>() {
         pipeline.addLast(HttpObjectAggregator(8192))
         pipeline.addLast(WebSocketServerProtocolHandler("/ws"))
 
-        TODO("pipeline.addLast(null)")
+        pipeline.addLast(TextWebSocketFrameHandler())
     }
 }

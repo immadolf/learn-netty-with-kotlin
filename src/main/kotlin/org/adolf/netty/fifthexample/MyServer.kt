@@ -4,6 +4,8 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.handler.logging.LogLevel
+import io.netty.handler.logging.LoggingHandler
 import org.adolf.netty.thirdexample.MyChatServerInitializer
 import java.net.InetSocketAddress
 
@@ -20,9 +22,10 @@ fun main() {
     //完成连接的处理
     val workerGroup: EventLoopGroup = NioEventLoopGroup()
     try {
-        val serverBootstrap: ServerBootstrap = ServerBootstrap()
+        val serverBootstrap = ServerBootstrap()
         serverBootstrap.group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel::class.java)
+            .handler(LoggingHandler(LogLevel.INFO))
             .childHandler(WebSocketChannelInitializer())
 
         // 绑定到端口
