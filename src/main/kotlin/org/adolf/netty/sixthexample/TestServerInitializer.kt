@@ -20,7 +20,7 @@ class TestServerInitializer :ChannelInitializer<SocketChannel>() {
         val pipeline = ch.pipeline()
 
         pipeline.addLast(ProtobufVarint32FrameDecoder())
-        pipeline.addLast(ProtobufDecoder(StudentProtos.Student.getDefaultInstance()))
+        pipeline.addLast(ProtobufDecoder(StudentProtos.MyMessage.getDefaultInstance()))
         pipeline.addLast(ProtobufVarint32LengthFieldPrepender())
         pipeline.addLast(ProtobufEncoder())
 
