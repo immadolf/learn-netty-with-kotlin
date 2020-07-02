@@ -8,7 +8,18 @@ import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 
 /**
- * selector ---- 不太能理解到底是啥模型
+ * selector.
+ *
+ * 自己的理解：
+ * selector是多路复用选择器，在这里多路指的就是多个channel(准确的说是SelectableChannel类的实例),
+ * 这里的复用指的是复用一个线程，这一个线程可以同时处理多个channel的状态，
+ * 而选择器的作用就是选出这些channel中处于就绪状态的channel，
+ * 既然选择器是选择channel的，那么选择器就必然和channel有联系，这个联系就是SelectionKey，
+ * SelectionKey这个名字太抽象了，我的理解是如果选择器和channel是两个实体，那SelectionKey就是连着这两个实体的线条，
+ * 可以从SelectionKey中得到对应的channel对象，这个也好理解，就像每条线条知道自己的端点在哪一样，
+ * 还有一点是当通道注册到选择器时（也就是把通道和选择器连接起来的时候），需要申明自己感兴趣的事件是什么，这就像是回调的时候总得
+ * 告诉别人什么时候回调你一样，特别需要注意的是，每一类的channel都有自己的兴趣范围，不能随意申明事件，比如ServerSocketChannel，
+ * 它能声明的事件只有OP_ACCEPT一种，这算是一种设计上的限制，毕竟一只猫的兴趣和一只狗的兴趣不会完全相同。
  */
 fun main() {
 
@@ -29,7 +40,6 @@ fun main() {
     }
 
     while (true) {
-        //这个程序还有bug，当客户端使用ctrl+c断开之后，服务端会一直获取到可读事件
         val keyNumbers = selector.select()
         println("keyNumbers: $keyNumbers")
 
@@ -52,12 +62,19 @@ fun main() {
                 val socketChannel = selectionKey.channel() as SocketChannel
                 var bytesRead = 0
                 val buffer = ByteBuffer.allocate(1024)
-                while (true) {
+                loop@ while (true) {
                     buffer.clear()
                     val read = socketChannel.read(buffer)
-                    // 当读不到数据的时候 read = 0
-                    if (read <= 0) {
-                        break
+
+                    when (read) {
+                        // 当读不到数据的时候 read = 0
+                        0 -> break@loop
+                        // 当客户端断开连接时，服务端还是可以获取到可读事件，因为服务端无法感知连接是否断开，此时读出的数据长度为-1
+                        // 当读到-1时，服务端需要主动关闭连接
+                        -1 -> {
+                            socketChannel.close()
+                            break@loop
+                        }
                     }
                     bytesRead += read
                     buffer.flip()
