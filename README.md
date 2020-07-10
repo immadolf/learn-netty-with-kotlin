@@ -33,3 +33,8 @@ https://www.notion.so/Netty-b6c166bf63ab4b87b8b6a0cbaccf80bb
 5. 默认情况下`NioEventLoop`中的`taskQueue`队列，`tailTaskQueue`队列和`maxPendingTasks`队列，最大长度为`Integer.MAX_VALUE`，最小不能低于*16*，可通过系统参数`io.netty.eventLoop.maxPendingTasks`指定.
 
 ---
+#### 2020.07.10
+JDK的future接口与netty的future接口。
+netty的future接口继承了JDK的future接口，并提供了一系列方法使得调用方更容易的使用Future：
+- JDK的Future，使用方需要主动查询计算是否已经完成，而Netty提供的Listener的机制，使控制权反转，当计算完成时，由Future主动调用使用方，这样更便于使用和扩展。
+- Netty的Future拆分了JDK的Future的isDone方法，使得使用者能更容易的区分Future的真实状态。
